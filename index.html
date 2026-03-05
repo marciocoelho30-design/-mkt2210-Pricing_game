@@ -16,15 +16,14 @@
   // ║  (replace EVERYTHING inside the curly braces below) ║
   // ╚══════════════════════════════════════════════════════╝
   const firebaseConfig = {
-  apiKey: "AIzaSyAqouvevPFERThkdLw3M2yi3PlARz4iqhU",
-  authDomain: "mkt2210-pricinggame.firebaseapp.com",
-  databaseURL: "https://mkt2210-pricinggame-default-rtdb.firebaseio.com",
-  projectId: "mkt2210-pricinggame",
-  storageBucket: "mkt2210-pricinggame.firebasestorage.app",
-  messagingSenderId: "148509901605",
-  appId: "1:148509901605:web:23ef9cbaf9013c84fe90cc"
-};
-
+    apiKey:            "PASTE_YOUR_apiKey_HERE",
+    authDomain:        "PASTE_YOUR_authDomain_HERE",
+    databaseURL:       "PASTE_YOUR_databaseURL_HERE",
+    projectId:         "PASTE_YOUR_projectId_HERE",
+    storageBucket:     "PASTE_YOUR_storageBucket_HERE",
+    messagingSenderId: "PASTE_YOUR_messagingSenderId_HERE",
+    appId:             "PASTE_YOUR_appId_HERE"
+  };
 
   const app = initializeApp(firebaseConfig);
   const db  = getDatabase(app);
@@ -372,10 +371,10 @@
       window._selectedOption = null;
     }
 
-    document.getElementById('studentRoundRevenue').textContent =
-      ((team.roundEarnings && team.roundEarnings[rid]) || 0).toLocaleString();
-    document.getElementById('studentTotalRevenue').textContent =
-      (team.totalRevenue || 0).toLocaleString();
+    // Hide earnings until professor reveals
+    document.getElementById('studentRoundRevenue').textContent = "?";
+    document.getElementById('studentTotalRevenue').textContent = "?";
+    document.getElementById('earningsCard').style.display = 'none';
   }
 
   window._selectedOption = null;
@@ -409,11 +408,15 @@
     document.getElementById('submitBtn').disabled = true;
     document.getElementById('submitBtn').textContent = "✅ Choice Submitted";
     document.getElementById('studentSubmitMsg').textContent = "Waiting for professor to reveal results…";
-    document.getElementById('studentRoundRevenue').textContent = earned.toLocaleString();
-    document.getElementById('studentTotalRevenue').textContent = newTotal.toLocaleString();
+    // Hide earnings until professor reveals
+    document.getElementById('studentRoundRevenue').textContent = "?";
+    document.getElementById('studentTotalRevenue').textContent = "?";
   };
 
   function showStudentResult(rid, team) {
+    // Make sure earnings card is visible again for next round
+    const ec = document.getElementById('earningsCard');
+    if(ec) ec.style.display = '';
     goTo('screen-student-result');
     const round    = ROUNDS[rid];
     const choiceIdx = team.choices && team.choices[rid] !== undefined ? team.choices[rid] : null;
@@ -434,6 +437,12 @@
         `<div class="result-block info"><p>You did not submit a choice this round.</p></div>`;
     }
     document.getElementById('resultRevenue').textContent = (team.totalRevenue||0).toLocaleString();
+    // Now update the earnings card with real values
+    const ec2 = document.getElementById('earningsCard');
+    if(ec2) ec2.style.display = '';
+    const roundEarn = (team.roundEarnings && team.roundEarnings[rid]) || 0;
+    document.getElementById('studentRoundRevenue').textContent = roundEarn.toLocaleString();
+    document.getElementById('studentTotalRevenue').textContent = (team.totalRevenue||0).toLocaleString();
     document.getElementById('resultNextMsg').textContent =
       rid < 3 ? "⏳ Waiting for professor to start next round…" : "🏁 Final round complete!";
   }
@@ -625,7 +634,7 @@
     <button class="btn btn-accent btn-full" id="submitBtn" onclick="submitChoice()" disabled>Submit My Choice</button>
     <div id="studentSubmitMsg" class="small-note" style="text-align:center;"></div>
   </div>
-  <div class="card">
+  <div class="card" id="earningsCard">
     <div class="round-revenue">Round Earnings</div>
     <div class="revenue-display">$<span id="studentRoundRevenue">0</span></div>
     <hr class="separator">
